@@ -263,29 +263,12 @@ STDMETHODIMP CArchiveExtractCallback::SetTotal(UInt64 size)
 STDMETHODIMP CArchiveExtractCallback::SetCompleted(const UInt64* completeValue)
 {
 	UInt64 cv = static_cast<UInt64>(*completeValue);
-
-	static int i = 0;
 	if (cv > 0)
 	{	
 		pushint(FileSize);
 		pushint(cv);
-
 		g_pluginParms->ExecuteCodeSegment(callbackID - 1, 0);
 	}
-	if (cv == FileSize)
-	{
-		CString strText;
-		strText.Format(_T("%d-%llu-%llu"), i, cv, FileSize);
-		MessageBox(NULL, strText, _T("SetCompleted"), MB_OK);
-	}
-
-	//g_pluginParms->ExecuteCodeSegment(callbackID - 1, 0);
-	
-	//printf_s("Exctract %.2f%%\n", static_cast<float>(*completeValue) / FileSize * 100.0f);
-	//setuservariable(INST_1,)
-// 	CString strText;
-// 	strText.Format(_T("%.2f%%"), static_cast<float>(*completeValue) / FileSize * 100.0f);
-	//MessageBox(NULL,strText, strText,MB_OK);
 	return S_OK;
 }
 
@@ -742,7 +725,7 @@ BOOL Extract7z(LPCTSTR szPathName)
 	if (!lib.Load(NDLL::GetModuleDirPrefix() + FTEXT(kDllName)))
 	{
 		//PrintError("Can not load 7-zip library");
-		MessageBox(NULL, _T("Can not load 7-zip library"), _T("2222"), MB_OK);
+		MessageBox(NULL, _T("加载7z.dll 失败"), _T("解压提示"), MB_OK);
 		return FALSE;
 	}
 	//获取接口
@@ -750,7 +733,7 @@ BOOL Extract7z(LPCTSTR szPathName)
 	if (!createObjectFunc)
 	{
 		//PrintError("Can not get CreateObject");
-		MessageBox(NULL, _T("Can not get CreateObject"), _T("2222"), MB_OK);
+		MessageBox(NULL, _T("获取接口失败"), _T("解压提示"), MB_OK);
 		return FALSE;
 	}
 
@@ -758,7 +741,7 @@ BOOL Extract7z(LPCTSTR szPathName)
 	if (createObjectFunc(&CLSID_Format, &IID_IInArchive, (void **)&archive) != S_OK)
 	{
 		//PrintError("Can not get class object");
-		MessageBox(NULL, _T("Can not get class object"), _T("2222"), MB_OK);
+		MessageBox(NULL, _T("获取对象失败"), _T("解压提示"), MB_OK);
 		return FALSE;
 	}
 
@@ -768,7 +751,7 @@ BOOL Extract7z(LPCTSTR szPathName)
 	if (!fileSpec->Open(szPathName))
 	{
 		//PrintError("Can not open archive file", szPathName);
-		MessageBox(NULL, _T("Can not open archive file"), _T("2222"), MB_OK);
+		MessageBox(NULL, _T("不能打开归档文件"), _T("解压提示"), MB_OK);
 		return FALSE;
 	}
 
@@ -783,7 +766,7 @@ BOOL Extract7z(LPCTSTR szPathName)
 		if (archive->Open(file, &scanSize, openCallback) != S_OK)
 		{
 			//PrintError("Can not open file as archive", szPathName);
-			MessageBox(NULL, _T("Can not open file as archive"), _T("2222"), MB_OK);
+			MessageBox(NULL, _T("不能打开文件作为档案"), _T("解压提示"), MB_OK);
 			return FALSE;
 		}
 	}
@@ -800,7 +783,7 @@ BOOL Extract7z(LPCTSTR szPathName)
 	if (result != S_OK)
 	{
 		//PrintError("Extract Error");
-		MessageBox(NULL, _T("Extract Error"), _T("2222"), MB_OK);
+		MessageBox(NULL, _T("解压7z失败"), _T("解压提示"), MB_OK);
 		return FALSE;
 	}
 	return TRUE;
@@ -814,7 +797,7 @@ void Extract7zAndCallBack(HWND hwndParent, int string_size, char *variables, sta
 	EXDLL_INIT();
 	extra->RegisterPluginCallback(g_hInstance, PluginCallback);
 	{
-		MessageBox(NULL, _T("Extract7zAndCallBack"), _T("2222"), MB_OK);
+		MessageBox(NULL, _T("Extract7zAndCallBack"), _T("解压提示"), MB_OK);
 		TCHAR pathName[MAX_PATH];
 		ZeroMemory(pathName, MAX_PATH);
 		popstring(pathName);
