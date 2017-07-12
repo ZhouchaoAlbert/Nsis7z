@@ -7,4 +7,31 @@
 ③右键项目”7z“，选择”链接器“，”输出文件“改为$(OutDir)$(TargetName)$(TargetExt)
 ④”链接器“->”映像具有安全异常处理程序“，改为”否“
 3.建立Nsis7zP插件工程(解压7z的插件进度回调传给nsi脚本)
+目录：CPP\7zip\UI\Nsis7zP
 4.把生成的7z.dll和Nsis7zP.dll 拷贝到另外的分支上Nsisu.git
+
+Nsi中使用Nsis7zP.dll：
+GetFunctionAddress $R9 ExtractCallback
+Nsis7zP::Extract7zAndCallBack "路径\Release.7z" $R9
+
+
+//回调给界面设置进度和百分比
+Function ExtractCallback
+    Pop $1
+    Pop $2
+    System::Int64Op $1 * 100
+    Pop $3
+    System::Int64Op $3 / $2
+    Pop $0
+	
+    UISkin::SetProgressValue "install_define_progress" $0  
+    UISkin::SetPercentValue "intall_percent" $0  
+    ${if}	$0 > 1
+      UISkin::SetControlData "install_tip" "正在安装..." "text"
+    ${EndIf}
+    ${If} $1 == $2
+        UISkin::SetProgressValue "install_define_progress" 100   
+        UISkin::SetPercentValue "intall_percent" 100	     
+        Call OnFinishBtnFunc
+    ${EndIf}
+FunctionEnd
