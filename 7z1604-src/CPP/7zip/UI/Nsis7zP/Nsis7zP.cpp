@@ -797,7 +797,7 @@ void Extract7zAndCallBack(HWND hwndParent, int string_size, char *variables, sta
 	EXDLL_INIT();
 	extra->RegisterPluginCallback(g_hInstance, PluginCallback);
 	{
-		MessageBox(NULL, _T("Extract7zAndCallBack"), _T("解压提示"), MB_OK);
+		//MessageBox(NULL, _T("Extract7zAndCallBack"), _T("解压提示"), MB_OK);
 		TCHAR pathName[MAX_PATH];
 		ZeroMemory(pathName, MAX_PATH);
 		popstring(pathName);
