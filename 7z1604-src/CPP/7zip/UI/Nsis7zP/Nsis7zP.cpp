@@ -243,7 +243,7 @@ public:
 	bool PasswordIsDefined;
 	UString Password;
 	UInt64 FileSize;
-	CArchiveExtractCallback() : PasswordIsDefined(false) {}
+	CArchiveExtractCallback() : PasswordIsDefined(false){}
 };
 
 void CArchiveExtractCallback::Init(IInArchive *archiveHandler, const FString &directoryPath)
@@ -265,9 +265,19 @@ STDMETHODIMP CArchiveExtractCallback::SetCompleted(const UInt64* completeValue)
 	UInt64 cv = static_cast<UInt64>(*completeValue);
 	if (cv > 0)
 	{	
-		pushint(FileSize);
-		pushint(cv);
-		g_pluginParms->ExecuteCodeSegment(callbackID - 1, 0);
+		if (cv > FileSize)
+		{
+			pushint(-10);
+			pushint(-1);
+			g_pluginParms->ExecuteCodeSegment(callbackID - 1, 0);
+		}
+		else
+		{
+			pushint(FileSize);
+			pushint(cv);
+			g_pluginParms->ExecuteCodeSegment(callbackID - 1, 0);
+		}
+	
 	}
 	return S_OK;
 }
@@ -367,7 +377,13 @@ STDMETHODIMP CArchiveExtractCallback::GetStream(UInt32 index,
 		{
 			if (!DeleteFileAlways(fullProcessedPath))
 			{
-				PrintError("Can not delete output file", fullProcessedPath);
+				//PrintError("Can not delete output file", fullProcessedPath);
+				CString strFormat2;
+				strFormat2.Format(_T("%s"), fullProcessedPath);
+				pushstring((TCHAR*)strFormat2.GetString());
+				pushint(-9);
+				pushint(-1);
+				g_pluginParms->ExecuteCodeSegment(callbackID - 1, 0);
 				return E_ABORT;
 			}
 		}
@@ -376,7 +392,11 @@ STDMETHODIMP CArchiveExtractCallback::GetStream(UInt32 index,
 		CMyComPtr<ISequentialOutStream> outStreamLoc(_outFileStreamSpec);
 		if (!_outFileStreamSpec->Open(fullProcessedPath, CREATE_ALWAYS))
 		{
-			PrintError("Can not open output file", fullProcessedPath);
+			//PrintError("Can not open output file", fullProcessedPath);
+			pushint(-8);
+			pushint(-1);
+			g_pluginParms->ExecuteCodeSegment(callbackID - 1, 0);
+			Sleep(1000);
 			return E_ABORT;
 		}
 		_outFileStream = outStreamLoc;
@@ -404,6 +424,7 @@ STDMETHODIMP CArchiveExtractCallback::PrepareOperation(Int32 askExtractMode)
 
 STDMETHODIMP CArchiveExtractCallback::SetOperationResult(Int32 operationResult)
 {
+
 	switch (operationResult)
 	{
 	case NArchive::NExtract::NOperationResult::kOK:
@@ -737,8 +758,8 @@ BOOL Extract7z(LPCTSTR szPathName)
 	{
 		//PrintError("Can not get CreateObject");
 		//MessageBox(NULL, _T("获取接口失败"), _T("解压提示"), MB_OK);
-		pushint(-1);
 		pushint(-2);
+		pushint(-1);
 		g_pluginParms->ExecuteCodeSegment(callbackID - 1, 0);
 		return FALSE;
 	}
@@ -748,8 +769,8 @@ BOOL Extract7z(LPCTSTR szPathName)
 	{
 		//PrintError("Can not get class object");
 		//MessageBox(NULL, _T("获取对象失败"), _T("解压提示"), MB_OK);
-		pushint(-1);
 		pushint(-3);
+		pushint(-1);
 		g_pluginParms->ExecuteCodeSegment(callbackID - 1, 0);
 		return FALSE;
 	}
@@ -760,9 +781,9 @@ BOOL Extract7z(LPCTSTR szPathName)
 	if (!fileSpec->Open(szPathName))
 	{
 		//PrintError("Can not open archive file", szPathName);
-		//MessageBox(NULL, _T("不能打开归档文件"), _T("解压提示"), MB_OK);
-		pushint(-1);
+		//MessageBox(NULL, _T("不能打开归档文件"), _T("解压提示"), MB_OK);	
 		pushint(-4);
+		pushint(-1);
 		g_pluginParms->ExecuteCodeSegment(callbackID - 1, 0);
 		return FALSE;
 	}
@@ -779,8 +800,8 @@ BOOL Extract7z(LPCTSTR szPathName)
 		{
 			//PrintError("Can not open file as archive", szPathName);
 			//MessageBox(NULL, _T("不能打开文件作为档案"), _T("解压提示"), MB_OK);
-			pushint(-1);
 			pushint(-5);
+			pushint(-1);
 			g_pluginParms->ExecuteCodeSegment(callbackID - 1, 0);
 			return FALSE;
 		}
@@ -790,6 +811,7 @@ BOOL Extract7z(LPCTSTR szPathName)
 	CMyComPtr<IArchiveExtractCallback> extractCallback(extractCallbackSpec);
 	extractCallbackSpec->Init(archive, FTEXT("")); // second parameter is output folder path
 	extractCallbackSpec->PasswordIsDefined = false;
+
 	// extractCallbackSpec->PasswordIsDefined = true;
 	// extractCallbackSpec->Password = L"1";
 
@@ -797,10 +819,11 @@ BOOL Extract7z(LPCTSTR szPathName)
 
 	if (result != S_OK)
 	{
+		archive->Close();
 		//PrintError("Extract Error");
 		//MessageBox(NULL, _T("解压7z失败"), _T("解压提示"), MB_OK);
-		pushint(-1);
 		pushint(-6);
+		pushint(-1);
 		g_pluginParms->ExecuteCodeSegment(callbackID - 1, 0);
 		return FALSE;
 	}
