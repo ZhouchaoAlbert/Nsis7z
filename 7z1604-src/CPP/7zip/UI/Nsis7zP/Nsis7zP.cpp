@@ -27,7 +27,7 @@
 #include "../../IPassword.h"
 #include "../../../../C/7zVersion.h"
 
-
+#include "Nsis7zLog.h"
 
 #include "Nsis7zApi.h"
 extern HINSTANCE  g_hInstance;
@@ -378,6 +378,7 @@ STDMETHODIMP CArchiveExtractCallback::GetStream(UInt32 index,
 			if (!DeleteFileAlways(fullProcessedPath))
 			{
 				//PrintError("Can not delete output file", fullProcessedPath);
+				Nsis7zLog::WriteNsis7zLog(_T("Nsis7zP"), _T("Can not delete output file:%s"), fullProcessedPath);
 				CString strFormat2;
 				strFormat2.Format(_T("%s"), fullProcessedPath);
 				pushstring((TCHAR*)strFormat2.GetString());
@@ -393,6 +394,7 @@ STDMETHODIMP CArchiveExtractCallback::GetStream(UInt32 index,
 		if (!_outFileStreamSpec->Open(fullProcessedPath, CREATE_ALWAYS))
 		{
 			//PrintError("Can not open output file", fullProcessedPath);
+			Nsis7zLog::WriteNsis7zLog(_T("Nsis7zP"), _T("Can not open output file:%s"), fullProcessedPath);
 			pushint(-8);
 			pushint(-1);
 			g_pluginParms->ExecuteCodeSegment(callbackID - 1, 0);
@@ -746,7 +748,7 @@ BOOL Extract7z(LPCTSTR szPathName)
 	if (!lib.Load(NDLL::GetModuleDirPrefix() + FTEXT(kDllName)))
 	{
 		//PrintError("Can not load 7-zip library");
-		//MessageBox(NULL, _T("加载7z.dll 失败"), _T("解压提示"), MB_OK);
+		Nsis7zLog::WriteNsis7zLog(_T("Nsis7zP"), _T("Can not load 7-zip library"));
 		pushint(-1);
 		pushint(-1);
 		g_pluginParms->ExecuteCodeSegment(callbackID - 1, 0);
@@ -757,7 +759,7 @@ BOOL Extract7z(LPCTSTR szPathName)
 	if (!createObjectFunc)
 	{
 		//PrintError("Can not get CreateObject");
-		//MessageBox(NULL, _T("获取接口失败"), _T("解压提示"), MB_OK);
+		Nsis7zLog::WriteNsis7zLog(_T("Nsis7zP"), _T("Can not get CreateObject"));
 		pushint(-2);
 		pushint(-1);
 		g_pluginParms->ExecuteCodeSegment(callbackID - 1, 0);
@@ -768,7 +770,7 @@ BOOL Extract7z(LPCTSTR szPathName)
 	if (createObjectFunc(&CLSID_Format, &IID_IInArchive, (void **)&archive) != S_OK)
 	{
 		//PrintError("Can not get class object");
-		//MessageBox(NULL, _T("获取对象失败"), _T("解压提示"), MB_OK);
+		Nsis7zLog::WriteNsis7zLog(_T("Nsis7zP"), _T("Can not get class object"));
 		pushint(-3);
 		pushint(-1);
 		g_pluginParms->ExecuteCodeSegment(callbackID - 1, 0);
@@ -781,7 +783,7 @@ BOOL Extract7z(LPCTSTR szPathName)
 	if (!fileSpec->Open(szPathName))
 	{
 		//PrintError("Can not open archive file", szPathName);
-		//MessageBox(NULL, _T("不能打开归档文件"), _T("解压提示"), MB_OK);	
+		Nsis7zLog::WriteNsis7zLog(_T("Nsis7zP"), _T("Can not open archive file:%s"), szPathName);
 		pushint(-4);
 		pushint(-1);
 		g_pluginParms->ExecuteCodeSegment(callbackID - 1, 0);
@@ -799,7 +801,7 @@ BOOL Extract7z(LPCTSTR szPathName)
 		if (archive->Open(file, &scanSize, openCallback) != S_OK)
 		{
 			//PrintError("Can not open file as archive", szPathName);
-			//MessageBox(NULL, _T("不能打开文件作为档案"), _T("解压提示"), MB_OK);
+			Nsis7zLog::WriteNsis7zLog(_T("Nsis7zP"), _T("Can not open file as archive:%s"), szPathName);
 			pushint(-5);
 			pushint(-1);
 			g_pluginParms->ExecuteCodeSegment(callbackID - 1, 0);
@@ -821,7 +823,7 @@ BOOL Extract7z(LPCTSTR szPathName)
 	{
 		archive->Close();
 		//PrintError("Extract Error");
-		//MessageBox(NULL, _T("解压7z失败"), _T("解压提示"), MB_OK);
+		Nsis7zLog::WriteNsis7zLog(_T("Nsis7zP"), _T("Extract Error"));
 		pushint(-6);
 		pushint(-1);
 		g_pluginParms->ExecuteCodeSegment(callbackID - 1, 0);
@@ -839,6 +841,7 @@ void Extract7zAndCallBack(HWND hwndParent, int string_size, char *variables, sta
 	extra->RegisterPluginCallback(g_hInstance, PluginCallback);
 	{
 		//MessageBox(NULL, _T("Extract7zAndCallBack"), _T("解压提示"), MB_OK);
+		Nsis7zLog::WriteNsis7zLog(_T("Nsis7zP"), _T("Extract7zAndCallBack init start"));
 		TCHAR pathName[MAX_PATH];
 		ZeroMemory(pathName, MAX_PATH);
 		popstring(pathName);

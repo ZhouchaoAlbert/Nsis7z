@@ -98,6 +98,7 @@
     <ClInclude Include="..\..\IStream.h" />
     <ClInclude Include="api.h" />
     <ClInclude Include="Nsis7zApi.h" />
+    <ClInclude Include="Nsis7zLog.h" />
     <ClInclude Include="pluginapi.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
@@ -125,6 +126,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
       </PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="Nsis7zLog.cpp" />
     <ClCompile Include="Nsis7zP.cpp" />
     <ClCompile Include="pluginapi.c">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>

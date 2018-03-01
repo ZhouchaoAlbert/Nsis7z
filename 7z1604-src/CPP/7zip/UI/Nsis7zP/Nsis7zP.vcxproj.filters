@@ -28,6 +28,9 @@
     <Filter Include="头文件\Interface">
       <UniqueIdentifier>{90c14fb8-f0d7-4318-adb7-a59587d3d557}</UniqueIdentifier>
     </Filter>
+    <Filter Include="头文件\Nsis7zLog">
+      <UniqueIdentifier>{85472578-9547-447a-9570-28cd6c983fa9}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -93,6 +96,9 @@
     <ClInclude Include="pluginapi.h">
       <Filter>头文件\Nsis</Filter>
     </ClInclude>
+    <ClInclude Include="Nsis7zLog.h">
+      <Filter>头文件\Nsis7zLog</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -148,6 +154,9 @@
     </ClCompile>
     <ClCompile Include="pluginapi.c">
       <Filter>头文件\Nsis</Filter>
+    </ClCompile>
+    <ClCompile Include="Nsis7zLog.cpp">
+      <Filter>头文件\Nsis7zLog</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
